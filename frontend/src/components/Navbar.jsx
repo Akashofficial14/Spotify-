@@ -9,21 +9,22 @@ import {
 import React from "react";
 import { songs } from "../AllSongs/Songs";
 import { useDispatch, useSelector } from "react-redux";
-import { filterSongArr } from "../features/filterSongSlice";
-import { clearQuery } from "../features/filterSongSlice";
+import { filterSongArr, clearQuery } from "../features/filterSongSlice";
 import Logout from "./Logout";
-import { LogoutFn } from "../features/AuthSlice";
+import { handleBackendLogout } from "../features/AuthSlice"; // 1. Imported the backend-linked function
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   let dispatch = useDispatch();
   let { logout } = useSelector((state) => state.auth);
+
   const handleSearch = (e) => {
     let query = e.target.value.toLowerCase();
     if (!query) {
       dispatch(clearQuery());
     }
     let filterSongs = songs.filter((elem) => {
-      return elem.song.toLowerCase().includes(query); //startWith bhi same hi hai
+      return elem.song.toLowerCase().includes(query);
     });
     dispatch(
       filterSongArr({
@@ -32,8 +33,18 @@ const Navbar = () => {
       }),
     );
   };
-  //query ka sidha use hai agar filterarray me koi data nhi hai par kuch na kuch likha hai search bar me jo match nhi kar rha
-  //tab aap ui show karwaoge no result found or agar aapne kuch nhi likha hai search bar me to clearQuery kiya hai
+
+  // 2. Added explicit async handler linked to the profile user avatar click
+  const triggerLogoutProcess = async () => {
+    try {
+      // Unwrap allows catch blocks to capture rejections directly from the action thunk
+      await dispatch(handleBackendLogout()).unwrap();
+      toast.success("Logged out successfully! Come back soon.");
+    } catch (err) {
+      toast.error(err || "Unable to complete logout process cleanly.");
+    }
+  };
+
   return (
     <nav className="hidden lg:flex h-[10vh] text-gray-500 w-full flex-row justify-between items-center p-8">
       {/* Spotify Logo */}
@@ -47,6 +58,7 @@ const Navbar = () => {
           </svg>
         </div>
       </div>
+
       <div className="part2 h-full w-full lg:w-[70%] justify-between items-center flex flex-col lg:flex-row gap-2 lg:gap-10">
         <div className="navcenter flex gap-2 lg:gap-5 justify-center items-center w-full lg:w-auto">
           <House
@@ -54,12 +66,9 @@ const Navbar = () => {
             className="p-2 lg:p-3 rounded-full bg-[#2A2A2A] text-white hover:bg-[#2d2c2c] w-[30px] h-[30px] lg:w-[45px] lg:h-[45px]"
           />
           <div className="relative w-full lg:w-110">
-            {/* The Icon */}
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
-
-            {/* Your Input */}
             <input
               className="w-full bg-[#2A2A2A] pl-11 pr-4 py-2 text-gray-200 text-sm lg:text-lg rounded-full border border-transparent focus:border-white hover:bg-[#2d2c2c] outline-none transition-all"
               type="text"
@@ -70,21 +79,24 @@ const Navbar = () => {
             />
           </div>
         </div>
+
         <div className="navright flex justify-center items-center gap-2 lg:gap-5">
-          <h3 className="px-2 py-1 lg:px-4 lg:py-1.5 text-base lg:text-md font-semibold bg-white text-black rounded-xl hover:scale-105">
+          <h3 className="px-2 py-1 lg:px-4 lg:py-1.5 text-base lg:text-md font-semibold bg-white text-black rounded-xl hover:scale-105 cursor-pointer">
             Explore Premium
           </h3>
-          <div className="down hidden lg:flex justify-center items-center gap-1 hover:text-white hover:scale-105 ">
+          <div className="down hidden lg:flex justify-center items-center gap-1 hover:text-white hover:scale-105 cursor-pointer">
             <Download /> <h2 className="font-semibold">Install App</h2>
           </div>
           <Bell
             size={24}
-            className="hover:text-white hover:scale-105 lg:w-[30px] lg:h-[25px]"
+            className="hover:text-white hover:scale-105 lg:w-[30px] lg:h-[25px] cursor-pointer"
           />
+
+          {/* 3. Replaced direct dispatch with network trigger method */}
           <CircleUserRound
             size={24}
-            onClick={() => dispatch(LogoutFn())}
-            className="hover:text-white hover:scale-105 lg:w-[25px] lg:h-[30px]"
+            onClick={triggerLogoutProcess}
+            className="hover:text-white hover:scale-105 lg:w-[25px] lg:h-[30px] cursor-pointer"
           />
           {logout ? <Logout /> : ""}
         </div>
@@ -92,4 +104,5 @@ const Navbar = () => {
     </nav>
   );
 };
+
 export default Navbar;

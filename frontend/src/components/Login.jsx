@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoginUser } from "../features/AuthSlice";
 import { toast } from "react-toastify";
+import axiosInstance from "../config/axiosInstance";
 // import { MyStore } from "../contextApi/MyContext";
 
 const Login = ({ settoggle }) => {
@@ -18,21 +19,68 @@ const Login = ({ settoggle }) => {
   } = useForm();
 
   //   let LSDRegData = JSON.parse(localStorage.getItem("regdata"));
-  const onSubmit = (data) => {
-    console.log("Login Data:", data);
-    let loginUser = regUserData.find(
-      (elem) => elem.email === data.email && elem.password === data.password,
-    );
-    if (loginUser) {
-      localStorage.setItem("logindata", JSON.stringify(data));
-      dispatch(setLoginUser(data));
-      reset();
-      toast.success("Login successful. Welcome back!")
-    } else {
-      toast.success("Invalid Credentials or Register first")
+  // const onSubmit = async(data) => {
+  //   console.log("Login Data:", data);
+  //    const res = await axiosInstance.post("/auth/login", data, {
+  //     withCredentials: true,
+  //   });
+  //   if (res) {
+  //     console.log("your res data coming from backend is--->", res);
+  //   }
+  //   let loginUser = regUserData.find(
+  //     (elem) => elem.email === data.email && elem.password === data.password,
+  //   );
+  //   if (loginUser) {
+  //     localStorage.setItem("logindata", JSON.stringify(data));
+  //     dispatch(setLoginUser(data));
+  //     reset();
+  //     toast.success("Login successful. Welcome back!")
+  //   } else {
+  //     toast.success("Invalid Credentials or Register first")
+  //   }
+  // };
+
+  const onSubmit = async (data) => {
+    console.log("Login Data Sent:", data);
+
+    try {
+      const res = await axiosInstance.post("/auth/login", data, {
+        withCredentials: true,
+      });
+
+      console.log("your res data coming from backend is--->", res);
+
+      // Check if the backend responded with a success flag
+      if (res.data?.success) {
+        const { token, user } = res.data.data;
+
+        // Save the authentication token and user details to localStorage
+        localStorage.setItem("token", token);
+        localStorage.setItem("logindata", JSON.stringify(user));
+
+        // Dispatch the backend user details to Redux instead of raw form inputs
+        dispatch(setLoginUser(user));
+
+        toast.success(res.data.message || "Login successful. Welcome back!");
+        reset();
+      } else {
+        // Fallback if status is 200 but success flag is false
+        console.log("your error is-->", res.data);
+        toast.error(
+          res.data?.message || "Invalid Credentials or Register first",
+        );
+      }
+    } catch (error) {
+      console.error("Login Error:", error?.response);
+
+      // Safely extract the exact error message sent back by your backend
+      const serverMessage = error.response?.data?.message;
+
+      console.log("Your extracted server message is --->", serverMessage);
+
+      toast.error(serverMessage || "Invalid Credentials or Register first");
     }
   };
-
   return (
     <div className="min-h-[100dvh] w-full bg-black flex items-center justify-center py-4 lg:py-10 px-4 lg:px-0">
       <div className="w-full max-w-md flex flex-col gap-24 px-4 lg:px-6 lg:gap-0">
@@ -137,7 +185,11 @@ const Login = ({ settoggle }) => {
                 >
                   {elem.text}
                 </button>
-                <img className="w-7 absolute left-4 top-1/2 -translate-y-1/2 " src={elem.img} alt="" />
+                <img
+                  className="w-7 absolute left-4 top-1/2 -translate-y-1/2 "
+                  src={elem.img}
+                  alt=""
+                />
               </div>
             ))}
           </div>
