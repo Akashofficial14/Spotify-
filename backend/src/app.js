@@ -4,8 +4,10 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const authRoutes = require("./router/auth.routes");
+const userRoutes=require("./router/user.routes")
 const connectDB = require("./config/db");
-const { errorMiddleware } = require("./middlewares/error.middleware")
+const { errorMiddleware } = require("./middlewares/error.middleware");
+const userModel = require("./models/user.model");
 const app = express()
 connectDB()
 app.use(cors({
@@ -42,7 +44,6 @@ passport.use(
           name,
           email,
           password: "google_auth_user",
-          userRole: "find_blood", // Hardcoded default for new social logins
           google_id: profile.id,
           isVerified: true,
         });
@@ -57,5 +58,6 @@ passport.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRoutes)
+app.use("/api/user",userRoutes)
 app.use(errorMiddleware)
 module.exports = app

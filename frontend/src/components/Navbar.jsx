@@ -11,12 +11,16 @@ import { songs } from "../AllSongs/Songs";
 import { useDispatch, useSelector } from "react-redux";
 import { filterSongArr, clearQuery } from "../features/filterSongSlice";
 import Logout from "./Logout";
-import { handleBackendLogout } from "../features/AuthSlice"; // 1. Imported the backend-linked function
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
+import { LogoutFn } from "../features/AuthSlice";
+import { useUserProfile } from "../hooks/user.hooks";
 
 const Navbar = () => {
   let dispatch = useDispatch();
+  let navigate = useNavigate();
   let { logout } = useSelector((state) => state.auth);
+  console.log("your logout is-->", logout);
 
   const handleSearch = (e) => {
     let query = e.target.value.toLowerCase();
@@ -34,16 +38,8 @@ const Navbar = () => {
     );
   };
 
-  // 2. Added explicit async handler linked to the profile user avatar click
-  const triggerLogoutProcess = async () => {
-    try {
-      // Unwrap allows catch blocks to capture rejections directly from the action thunk
-      await dispatch(handleBackendLogout()).unwrap();
-      toast.success("Logged out successfully! Come back soon.");
-    } catch (err) {
-      toast.error(err || "Unable to complete logout process cleanly.");
-    }
-  };
+  let { data, isLoading, isError } = useUserProfile();
+  console.log("your data comng from backend is ", data);
 
   return (
     <nav className="hidden lg:flex h-[10vh] text-gray-500 w-full flex-row justify-between items-center p-8">
@@ -92,12 +88,23 @@ const Navbar = () => {
             className="hover:text-white hover:scale-105 lg:w-[30px] lg:h-[25px] cursor-pointer"
           />
 
-          {/* 3. Replaced direct dispatch with network trigger method */}
-          <CircleUserRound
-            size={24}
-            onClick={triggerLogoutProcess}
-            className="hover:text-white hover:scale-105 lg:w-[25px] lg:h-[30px] cursor-pointer"
-          />
+          {/* DYNAMIC AVATAR: Switches between the initial badge or the fallback icon */}
+          {!isLoading && !isError && data?.name ? (
+            <div
+              onClick={() => dispatch(LogoutFn())}
+              className="w-[32px] h-[32px] lg:w-[36px] lg:h-[36px] rounded-full bg-[#1ed760] text-black font-bold flex items-center justify-center text-sm lg:text-base select-none cursor-pointer hover:scale-105 transition-all"
+              title={`Logged in as ${data.name}`}
+            >
+              {data.name.charAt(0).toUpperCase()}
+            </div>
+          ) : (
+            <CircleUserRound
+              size={24}
+              onClick={() => dispatch(LogoutFn())}
+              className="hover:text-white hover:scale-105 lg:w-[25px] lg:h-[30px] cursor-pointer"
+            />
+          )}
+
           {logout ? <Logout /> : ""}
         </div>
       </div>

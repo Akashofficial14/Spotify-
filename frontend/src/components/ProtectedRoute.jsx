@@ -1,13 +1,20 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { Navigate, Outlet } from 'react-router'
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-    let {loginUserData} = useSelector((state)=>(state.auth))
-  if(!loginUserData){
-    return <Navigate to={'/'}/>
-  }
-  return <Outlet/>
-}
+  const token = localStorage.getItem("token");
+  const rawUser = localStorage.getItem("logindata");
 
-export default ProtectedRoute
+  // Verify that the token exists and 'user' isn't just the literal string "null" or "undefined"
+  const isAuthenticated = token && rawUser && rawUser !== "null" && rawUser !== "undefined";
+
+  console.log("Route Guard Status -> Authenticated:", !!isAuthenticated);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export default ProtectedRoute;

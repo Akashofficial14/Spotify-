@@ -5,6 +5,8 @@ import AuthLayout from "../layouts/AuthLayout";
 import HomeLayout from "../layouts/HomeLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
+import GoogleAuthSuccess from "../components/GoogleAuthSuccess";
+// import SpotifyPhoneAuth from "../components/SpotifyPhoneAuth";
 
 const AppRouter = () => {
   let router = createBrowserRouter([
@@ -16,6 +18,14 @@ const AppRouter = () => {
           path: "",
           element: <AuthLayout />,
         },
+         {
+          path: "/google-auth-success/:token",
+          element: <GoogleAuthSuccess />,
+        },
+        // {
+        //   path:"/mobile-number-login",
+        //   element:<SpotifyPhoneAuth/>
+        // }
       ],
     },
     {

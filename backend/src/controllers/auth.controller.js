@@ -232,6 +232,59 @@ const updatePasswordController = async (req, res, next) => {
     }
 };
 
+const phoneLoginSuccessController = async (req, res, next) => {
+    try {
+        const { uid, phoneNumber } = req.body; // Received e.g., "+919174571636"
+        
+        if (!phoneNumber) {
+            throw new customError("Phone number tracking verification payload missing", 400);
+        }
+
+        // FIX: Extract only the last 10 digits to strip out "+91", "+1", etc.
+        // This ensures it matches your database's normal registration format perfectly!
+        const clean10DigitPhone = phoneNumber.replace(/\D/g, "").slice(-10); 
+
+        console.log(`Original: ${phoneNumber} | Looking up database with: ${clean10DigitPhone}`);
+
+        // 1. Search for an existing user matching the clean 10-digit number
+        let user = await userModel.findOne({ phone: clean10DigitPhone });
+
+        // 2. First-time Login / Lazy Registration Step
+        if (!user) {
+            // Save it as a clean 10-digit number for consistency with normal registrations
+            user = await userModel.create({
+                name: `Spotify User ${clean10DigitPhone.slice(-4)}`, 
+                email: `${uid}@phone.spotify.com`,            
+                phone: clean10DigitPhone, // Stored cleanly without country code
+                password: uid,                                 
+            });
+        }
+
+        if (!user) throw new customError("Failed to synchronize user profile session database metrics", 400);
+
+        // 3. Generate your standard application JWT session token
+        let token = user.generateToken();
+   console.log("your genrated token and user is-->",token,user)
+        // 4. Inject cookies matching your current production policy rules
+        res.cookie("token", token, {
+            httpOnly: false,
+            secure: true,      
+            sameSite: "none",  
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        // 5. Respond using your application's structural response utilities
+        return responseUtil.success(
+            res,
+            { token, user },
+            "User logged in successfully via Mobile Verification",
+        );
+        
+    } catch (error) {
+        return next(error);
+    }
+};
+
 const updateProfileController = async (req, res, next) => {
     try {
         const { userID } = req.params;
@@ -264,4 +317,4 @@ const updateProfileController = async (req, res, next) => {
     }
 };
 
-module.exports = { registerController, loginController, logoutController, forgetPasswordController, resetPasswordController, updatePasswordController, updateProfileController }
+module.exports = { registerController, loginController, logoutController, forgetPasswordController, phoneLoginSuccessController, resetPasswordController, updatePasswordController, updateProfileController }

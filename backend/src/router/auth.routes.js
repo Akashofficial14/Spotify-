@@ -1,6 +1,6 @@
 const express = require('express')
-const jwt=require('jsonwebtoken')
-const { registerController, loginController, logoutController, forgetPasswordController, resetPasswordController, updatePasswordController, updateProfileController } = require('../controllers/auth.controller')
+const jwt = require('jsonwebtoken')
+const { registerController, loginController, logoutController, forgetPasswordController, resetPasswordController, updatePasswordController, updateProfileController, phoneLoginSuccessController } = require('../controllers/auth.controller')
 const authMiddleware = require('../middlewares/auth.middleware')
 const passport = require('passport')
 const router = express.Router()
@@ -13,12 +13,13 @@ router.post("/forget-password", forgetPasswordController)
 router.get("/reset-password/:token", resetPasswordController)
 router.post("/update-password/:userID", updatePasswordController)
 router.put("/update-profile/:userID", authMiddleware, updateProfileController);
-
+//mobile auth
+router.post("/phone-login-success",phoneLoginSuccessController)
 //Google-auth
 router.get("/google", passport.authenticate("google", { scope: ['profile', 'email'], prompt: "select_account" }))
 
-router.get("/google/callback", 
-  passport.authenticate('google', { 
+router.get("/google/callback",
+  passport.authenticate('google', {
     session: false,
     failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_auth_failed`
   }),
@@ -26,8 +27,8 @@ router.get("/google/callback",
     try {
       console.log("Google callback - User authenticated:", req.user.email)
       const token = jwt.sign(
-        { id: req.user._id, email: req.user.email, userRole: req.user.userRole }, 
-        process.env.JWT_TOKEN, 
+        { id: req.user._id, email: req.user.email },
+        process.env.JWT_TOKEN,
         { expiresIn: '24h' }
       );
 
@@ -40,8 +41,8 @@ router.get("/google/callback",
   }
 );
 router.get("/profile", authMiddleware, (req, res) => {
-    // authMiddleware decodes the JWT and puts user info in req.user
-    res.json({ user: req.user });
+  // authMiddleware decodes the JWT and puts user info in req.user
+  res.json({ user: req.user });
 });
 
 module.exports = router

@@ -7,12 +7,22 @@ export const handleBackendLogout = createAsyncThunk(
   "auth/handleBackendLogout",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/auth/logout", {}, {
-        withCredentials: true, // Crucial for passing cookies over to the backend to get cleared
-      });
+      // 1. Fetch the token from localStorage right before sending the request
+      const token = localStorage.getItem("token");
+
+      const res = await axiosInstance.post(
+        "/auth/logout",
+        {}, // Empty body
+        {
+          withCredentials: true, // For cookies if your backend uses them
+          headers: {
+            // 2. Attach the token to the headers so your auth middleware finds it
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
       return res.data;
     } catch (error) {
-      // Gracefully catches errors using your Express error middleware layout
       return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
   }

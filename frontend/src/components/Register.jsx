@@ -39,7 +39,7 @@ const Register = ({ settoggle }) => {
         // Display the actual success message returned by your server
         toast.success(
           // res.data.message ||
-            "Account created successfully. Welcome to Spotify!",
+          "Account created successfully. Welcome to Spotify!",
         );
 
         reset();
@@ -75,9 +75,15 @@ const Register = ({ settoggle }) => {
     }
   };
 
+  const handleGoogleAuth = () => {
+    console.log("i am clickingg here in btn");
+    // Now proceed to Google Login
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+  };
+
   return (
-    <div className="min-h-[100dvh] bg-black flex items-center justify-center py-4 lg:py-10 px-4 lg:px-0">
-      <div className="w-full max-w-md px-4 flex flex-col gap-18 lg:px-6 lg:gap-0">
+    <div className="min-h-[100dvh] bg-[#121212] flex items-center justify-center py-4 lg:py-10 px-4 lg:px-0">
+      <div className="w-full max-w-md px-4 flex flex-col gap-8 lg:px-6 lg:gap-5">
         {/* Spotify Logo */}
         <div className="flex justify-center flex-col items-center gap-2 mb-4">
           <svg
@@ -106,7 +112,7 @@ const Register = ({ settoggle }) => {
                 type="text"
                 {...register("name", { required: "Name is required" })}
                 placeholder="name"
-                className="w-full bg-black border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
+                className="w-full bg-[#121212] border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
               />
               {errors.name && (
                 <p className="text-red-500 text-xs mt-1">
@@ -130,7 +136,7 @@ const Register = ({ settoggle }) => {
                     message: "Invalid email address",
                   },
                 })}
-                className="w-full bg-black border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
+                className="w-full bg-[#121212] border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">
@@ -154,7 +160,7 @@ const Register = ({ settoggle }) => {
                     message: "Phone number must be 10 digits",
                   },
                 })}
-                className="w-full bg-black border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
+                className="w-full bg-[#121212] border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
               />
               {errors.phone && (
                 <p className="text-red-500 text-xs mt-1">
@@ -178,7 +184,7 @@ const Register = ({ settoggle }) => {
                     message: "Minimum 6 characters",
                   },
                 })}
-                className="w-full bg-black border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
+                className="w-full bg-[#121212] border border-gray-600 rounded-md px-3 py-2 text-sm lg:text-base text-white focus:outline-none focus:border-white"
               />
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">
@@ -210,12 +216,8 @@ const Register = ({ settoggle }) => {
                 img: "https://img.icons8.com/?size=100&id=V5cGWnc9R4xj&format=png&color=000000",
                 text: "Continue with Google",
               },
-              {
-                img: "https://img.icons8.com/?size=100&id=WUbpOIDjs4KP&format=png&color=000000",
-                text: "Continue with Apple",
-              },
             ].map((elem) => (
-              <div className="box relative">
+              <div className="box relative" onClick={handleGoogleAuth}>
                 <button
                   // key={}
                   type="button"
@@ -237,9 +239,7 @@ const Register = ({ settoggle }) => {
             Already have an account? <br />
             <span
               className="text-white text-lg lg:text-base font-semibold hover:scale-110 transition duration-300 cursor-pointer"
-              onClick={() => {
-                settoggle((prev) => !prev);
-              }}
+              onClick={() => settoggle("login")}
             >
               Log in
             </span>

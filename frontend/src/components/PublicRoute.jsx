@@ -1,13 +1,18 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { Navigate, Outlet } from 'react-router'
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
 const PublicRoute = () => {
-  let {loginUserData} = useSelector((state)=>(state.auth))
-  if(loginUserData){
-    return <Navigate to={'/home'}/>
-  }
-  return <Outlet/>
-}
+  const token = localStorage.getItem("token");
+  const rawUser = localStorage.getItem("logindata");
 
-export default PublicRoute
+  // Verify that the token exists and 'user' isn't just the literal string "null" or "undefined"
+  const isAuthenticated = token && rawUser && rawUser !== "null" && rawUser !== "undefined";
+
+  if (isAuthenticated) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export default PublicRoute;
