@@ -43,7 +43,7 @@ const Register = ({ settoggle }) => {
         );
 
         reset();
-        settoggle((prev) => !prev);
+        settoggle("login")
       } else {
         toast.error(
           res.data?.message || "Registration failed. Please try again.",

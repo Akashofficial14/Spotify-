@@ -43,30 +43,50 @@ const PhoneInputPage = ({
 
           <div className="w-full flex gap-2">
             <div className="relative flex items-center bg-[#121212] border border-zinc-500 rounded-[4px] hover:border-white focus-within:border-[#1ed760] transition-all px-3">
-  <select
-    value={countryCode}
-    onChange={(e) => setCountryCode(e.target.value)}
-    className="bg-transparent text-white text-sm sm:text-base font-medium pr-6 py-3 outline-none cursor-pointer appearance-none"
-  >
-    {/* Explicitly styled option tags prevent browser white-flashing highlights */}
-    <option className="bg-[#181818] text-white" value="+91">+91 (IN)</option>
-    <option className="bg-[#181818] text-white" value="+1">+1 (US/CA)</option>
-    <option className="bg-[#181818] text-white" value="+44">+44 (UK)</option>
-    <option className="bg-[#181818] text-white" value="+61">+61 (AU)</option>
-    <option className="bg-[#181818] text-white" value="+971">+971 (AE)</option>
-    <option className="bg-[#181818] text-white" value="+49">+49 (DE)</option>
-    <option className="bg-[#181818] text-white" value="+33">+33 (FR)</option>
-    <option className="bg-[#181818] text-white" value="+65">+65 (SG)</option>
-    <option className="bg-[#181818] text-white" value="+81">+81 (JP)</option>
-    <option className="bg-[#181818] text-white" value="+27">+27 (ZA)</option>
-  </select>
-  
-  <div className="absolute right-3 pointer-events-none text-zinc-400">
-    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-      <path d="M7 10l5 5 5-5z" />
-    </svg>
-  </div>
-</div>
+              <select
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="bg-transparent text-white text-sm sm:text-base font-medium pr-6 py-3 outline-none cursor-pointer appearance-none"
+              >
+                {/* Explicitly styled option tags prevent browser white-flashing highlights */}
+                <option className="bg-[#181818] text-white" value="+91">
+                  +91 (IN)
+                </option>
+                <option className="bg-[#181818] text-white" value="+1">
+                  +1 (US/CA)
+                </option>
+                <option className="bg-[#181818] text-white" value="+44">
+                  +44 (UK)
+                </option>
+                <option className="bg-[#181818] text-white" value="+61">
+                  +61 (AU)
+                </option>
+                <option className="bg-[#181818] text-white" value="+971">
+                  +971 (AE)
+                </option>
+                <option className="bg-[#181818] text-white" value="+49">
+                  +49 (DE)
+                </option>
+                <option className="bg-[#181818] text-white" value="+33">
+                  +33 (FR)
+                </option>
+                <option className="bg-[#181818] text-white" value="+65">
+                  +65 (SG)
+                </option>
+                <option className="bg-[#181818] text-white" value="+81">
+                  +81 (JP)
+                </option>
+                <option className="bg-[#181818] text-white" value="+27">
+                  +27 (ZA)
+                </option>
+              </select>
+
+              <div className="absolute right-3 pointer-events-none text-zinc-400">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z" />
+                </svg>
+              </div>
+            </div>
 
             <input
               type="tel"
@@ -135,17 +155,16 @@ const PhoneInputPage = ({
         ))}
       </div>
 
-
       {/* FIXED CLICK ROUTER TARGET LINK */}
       <p className="text-center text-white text-md lg:text-gray-400 text-md mt-6 lg:mt-8">
-            Don&apos;t have an account? <br />
-            <span
-              className="text-white text-lg lg:text-base font-semibold transform hover:scale-110 transition duration-300 cursor-pointer"
-              onClick={() => settoggle("register")}
-            >
-              Sign up
-            </span>
-          </p>
+        Don&apos;t have an account? <br />
+        <span
+          className="text-white text-lg lg:text-base font-semibold transform hover:scale-110 transition duration-300 cursor-pointer"
+          onClick={() => settoggle("register")}
+        >
+          Sign up
+        </span>
+      </p>
     </div>
   );
 };

@@ -4,16 +4,29 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const authRoutes = require("./router/auth.routes");
-const userRoutes=require("./router/user.routes")
+const userRoutes = require("./router/user.routes")
 const connectDB = require("./config/db");
 const { errorMiddleware } = require("./middlewares/error.middleware");
 const userModel = require("./models/user.model");
 const app = express()
 connectDB()
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}))
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://spotify-ikov.vercel.app/",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(passport.initialize());
 passport.use(
   new GoogleStrategy(
@@ -58,6 +71,6 @@ passport.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRoutes)
-app.use("/api/user",userRoutes)
+app.use("/api/user", userRoutes)
 app.use(errorMiddleware)
 module.exports = app

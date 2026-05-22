@@ -235,14 +235,14 @@ const updatePasswordController = async (req, res, next) => {
 const phoneLoginSuccessController = async (req, res, next) => {
     try {
         const { uid, phoneNumber } = req.body; // Received e.g., "+919174571636"
-        
+
         if (!phoneNumber) {
             throw new customError("Phone number tracking verification payload missing", 400);
         }
 
         // FIX: Extract only the last 10 digits to strip out "+91", "+1", etc.
         // This ensures it matches your database's normal registration format perfectly!
-        const clean10DigitPhone = phoneNumber.replace(/\D/g, "").slice(-10); 
+        const clean10DigitPhone = phoneNumber.replace(/\D/g, "").slice(-10);
 
         console.log(`Original: ${phoneNumber} | Looking up database with: ${clean10DigitPhone}`);
 
@@ -253,10 +253,10 @@ const phoneLoginSuccessController = async (req, res, next) => {
         if (!user) {
             // Save it as a clean 10-digit number for consistency with normal registrations
             user = await userModel.create({
-                name: `Spotify User ${clean10DigitPhone.slice(-4)}`, 
-                email: `${uid}@phone.spotify.com`,            
+                name: `Spotify User ${clean10DigitPhone.slice(-4)}`,
+                email: `${uid}@phone.spotify.com`,
                 phone: clean10DigitPhone, // Stored cleanly without country code
-                password: uid,                                 
+                password: uid,
             });
         }
 
@@ -264,12 +264,12 @@ const phoneLoginSuccessController = async (req, res, next) => {
 
         // 3. Generate your standard application JWT session token
         let token = user.generateToken();
-   console.log("your genrated token and user is-->",token,user)
+        console.log("your genrated token and user is-->", token, user)
         // 4. Inject cookies matching your current production policy rules
         res.cookie("token", token, {
             httpOnly: false,
-            secure: true,      
-            sameSite: "none",  
+            secure: true,
+            sameSite: "none",
             maxAge: 24 * 60 * 60 * 1000
         });
 
@@ -279,7 +279,7 @@ const phoneLoginSuccessController = async (req, res, next) => {
             { token, user },
             "User logged in successfully via Mobile Verification",
         );
-        
+
     } catch (error) {
         return next(error);
     }
