@@ -12,7 +12,7 @@ const app = express()
 connectDB()
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://spotify-ikov.vercel.app/",
+  "https://spotify-ikov.vercel.app",
 ];
 
 app.use(
